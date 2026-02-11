@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Shield, Mic, Bot, Users, Zap, Ghost } from 'lucide-react';
+import { MessageSquare, Shield, Mic, Bot, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const features = [
@@ -14,24 +14,26 @@ const features = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen haunted-bg">
+    <div className="min-h-screen bg-black text-white">
       {/* Nav */}
-      <nav className="fixed top-0 w-full z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-gray-900 bg-black/90 backdrop-blur-xl">
         <div className="container mx-auto flex items-center justify-between h-16 px-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
-              <Ghost className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-display font-bold text-lg tracking-wide text-foreground">
-              Spectral<span className="text-primary">Commune</span>
+            <img 
+              src="https://preview.redd.it/harold-4k-png-v0-b01zxg150zt81.png?width=640&crop=smart&auto=webp&s=c1b66d012695f1b68518a74af96feaa683bd9fed"
+              alt="Haunted Cord" 
+              className="w-8 h-8 rounded-lg"
+            />
+            <span className="font-bold text-lg tracking-wide text-white">
+              Haunted<span className="text-red-500">Cord</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/login">
-              <Button variant="ghost" size="sm">Log In</Button>
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-900">Log In</Button>
             </Link>
             <Link to="/register">
-              <Button size="sm" className="glow-red">Sign Up</Button>
+              <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">Sign Up</Button>
             </Link>
           </div>
         </div>
@@ -45,18 +47,18 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 leading-tight">
-              Where Spirits
-              <span className="text-primary text-glow block">Communicate</span>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              Where Dark
+              <span className="text-red-500 block">Souls Gather</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl mx-auto leading-relaxed">
-              A dark, ethereal communication platform built for modern communities. 
-              No compromises. No limits. Free forever.
+            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
+              A pure dark communication platform built for shadows. 
+              No compromises. No limits. Forever free.
             </p>
             <div className="flex gap-4 justify-center">
               <Link to="/register">
-                <Button size="lg" className="glow-red text-base px-8">
-                  Join the Commune — Free
+                <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-base px-8">
+                  Enter the Darkness — Free
                 </Button>
               </Link>
             </div>
@@ -65,29 +67,29 @@ export default function Landing() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-gray-950">
         <div className="container mx-auto max-w-5xl">
           <motion.h2 
-            className="text-3xl font-display font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-16 text-white"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            Built for <span className="text-primary">Modern Communities</span>
+            Built for <span className="text-red-500">True Darkness</span>
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all group"
+                className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-red-900/50 transition-all group"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <f.icon className="w-8 h-8 text-primary mb-4 group-hover:text-glow transition-all" />
-                <h3 className="font-semibold text-foreground mb-2 font-display">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.desc}</p>
+                <f.icon className="w-8 h-8 text-red-500 mb-4 group-hover:text-red-400 transition-all" />
+                <h3 className="font-semibold text-white mb-2">{f.title}</h3>
+                <p className="text-sm text-gray-400">{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -95,9 +97,9 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6">
-        <div className="container mx-auto text-center text-sm text-muted-foreground">
-          © 2026 Spectral Commune. All rights reserved.
+      <footer className="border-t border-gray-900 py-8 px-6 bg-black">
+        <div className="container mx-auto text-center text-sm text-gray-500">
+          © 2026 Haunted Cord. All rights reserved.
         </div>
       </footer>
     </div>
