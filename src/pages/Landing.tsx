@@ -48,16 +48,22 @@ export default function Landing() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              True <span className="text-red-500 block">Haunted</span>
+              <span className="text-red-500 block" style={{
+                textShadow: '0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.3)',
+                fontFamily: 'serif',
+                letterSpacing: '0.05em'
+              }}>
+                Stay Anonymous
+              </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
-              A pure dark communication platform built for shadows. 
-              No compromises. No limits. Forever free.
+              Where shadows communicate freely. 
+              No traces. No limits. Complete privacy.
             </p>
             <div className="flex gap-4 justify-center">
               <Link to="/register">
                 <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-base px-8">
-                  Enter the Darkness — Free
+                  Enter the Shadows — Free
                 </Button>
               </Link>
             </div>

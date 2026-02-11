@@ -26,9 +26,10 @@ interface Props {
   onSelectChannel: (channelId: string) => void;
   serverName: string;
   onServerUpdate?: () => void;
+  onServerDeleted?: () => void;
 }
 
-export default function ChannelSidebar({ serverId, activeChannelId, onSelectChannel, serverName, onServerUpdate }: Props) {
+export default function ChannelSidebar({ serverId, activeChannelId, onSelectChannel, serverName, onServerUpdate, onServerDeleted }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [showSettings, setShowSettings] = useState(false);
@@ -69,10 +70,10 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
       {/* Server header */}
       <div 
         className="h-12 px-4 flex items-center justify-between border-b border-border hover:bg-surface-hover transition-colors cursor-pointer"
-        onClick={() => setShowSettings(true)}
+        onClick={() => setShowManagement(true)}
       >
         <span className="font-semibold text-sm truncate">{serverName}</span>
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        <Settings className="w-4 h-4 text-muted-foreground" />
       </div>
 
       {/* Channel list */}
@@ -177,6 +178,9 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
         serverId={serverId}
         onUpdated={() => {
           // Refresh server data if needed
+        }}
+        onDeleted={() => {
+          onServerDeleted?.();
         }}
       />
       

@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
-import { Settings, Mic, Headphones, Shield } from 'lucide-react';
+import { Settings, Mic, Headphones, Shield, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -36,6 +36,17 @@ export default function UserPanel() {
         </div>
       </div>
       <div className="flex items-center gap-0.5">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button 
+              onClick={() => navigate('/home')}
+              className="p-1.5 rounded hover:bg-surface-hover text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="w-4 h-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Home</TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
             <button className="p-1.5 rounded hover:bg-surface-hover text-muted-foreground hover:text-foreground transition-colors">

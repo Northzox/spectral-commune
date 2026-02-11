@@ -15,6 +15,14 @@ export default function AppLayout() {
   const [serverName, setServerName] = useState('');
   const [channelName, setChannelName] = useState('');
 
+  const handleServerDeleted = () => {
+    // Reset active server and channel when server is deleted
+    setActiveServerId(null);
+    setActiveChannelId(null);
+    setServerName('');
+    setChannelName('');
+  };
+
   const handleServerUpdate = () => {
     // Refresh server data
     if (activeServerId) {
@@ -62,32 +70,31 @@ export default function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="h-screen flex overflow-hidden bg-background">
+    <div className="h-screen flex bg-background">
       <ServerSidebar activeServerId={activeServerId} onSelectServer={setActiveServerId} />
       
       {activeServerId ? (
         <>
-          <div className="flex flex-col">
-            <ChannelSidebar
-              serverId={activeServerId}
-              activeChannelId={activeChannelId}
-              onSelectChannel={setActiveChannelId}
-              serverName={serverName}
-              onServerUpdate={handleServerUpdate}
-            />
+          <ChannelSidebar
+            serverId={activeServerId}
+            activeChannelId={activeChannelId}
+            onSelectChannel={setActiveChannelId}
+            serverName={serverName}
+            onServerUpdate={handleServerUpdate}
+            onServerDeleted={handleServerDeleted}
+          />
+          <div className="flex-1 flex flex-col">
+            {activeChannelId ? (
+              <ChatArea channelId={activeChannelId} channelName={channelName} />
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <p>Select a channel to start chatting</p>
+              </div>
+            )}
             <UserPanel />
           </div>
-          {activeChannelId ? (
-            <ChatArea channelId={activeChannelId} channelName={channelName} />
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              <p>Select a channel to start chatting</p>
-            </div>
-          )}
-          <div className="w-60 bg-card border-l border-border">
+          <div className="w-64 bg-card border-l border-border">
             <ServerMemberList 
-              open={true}
-              onOpenChange={() => {}}
               serverId={activeServerId}
               asSidebar={true}
             />
@@ -95,12 +102,7 @@ export default function AppLayout() {
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary font-display font-bold text-2xl">H</span>
-            </div>
-            <p className="font-display text-lg">Create or join a server to get started</p>
-          </div>
+          <p>Select a server to start chatting</p>
         </div>
       )}
     </div>

@@ -6,7 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Settings, 
   Hash, 
@@ -20,7 +22,10 @@ import {
   Users,
   Crown,
   Shield,
-  User
+  User,
+  Upload,
+  Check,
+  X
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -51,6 +56,21 @@ interface ServerMember {
     username: string;
     avatar_url: string | null;
     presence: string;
+  };
+}
+
+interface CustomRole {
+  id: string;
+  name: string;
+  color: string;
+  permissions: {
+    manage_server: boolean;
+    manage_channels: boolean;
+    manage_roles: boolean;
+    kick_members: boolean;
+    ban_members: boolean;
+    send_messages: boolean;
+    connect_voice: boolean;
   };
 }
 
@@ -89,12 +109,31 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
   const [channels, setChannels] = useState<Channel[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [members, setMembers] = useState<ServerMember[]>([]);
+  const [customRoles, setCustomRoles] = useState<CustomRole[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Form states
-  const [serverSettings, setServerSettings] = useState({ name: serverName, description: '' });
+  const [serverSettings, setServerSettings] = useState({ 
+    name: serverName, 
+    description: '',
+    icon_url: '',
+    banner_url: ''
+  });
   const [newChannel, setNewChannel] = useState({ name: '', type: 'text' as const, categoryId: '', topic: '' });
   const [newCategory, setNewCategory] = useState({ name: '' });
+  const [newRole, setNewRole] = useState({ 
+    name: '', 
+    color: '#5865F2',
+    permissions: {
+      manage_server: false,
+      manage_channels: false,
+      manage_roles: false,
+      kick_members: false,
+      ban_members: false,
+      send_messages: true,
+      connect_voice: true
+    }
+  });
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
@@ -130,7 +169,12 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
   const handleSaveServerSettings = async () => {
     const { error } = await supabase
       .from('servers')
-      .update({ name: serverSettings.name, description: serverSettings.description })
+      .update({ 
+        name: serverSettings.name, 
+        description: serverSettings.description,
+        icon_url: serverSettings.icon_url,
+        banner_url: serverSettings.banner_url
+      })
       .eq('id', serverId);
 
     if (error) {
@@ -139,6 +183,90 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
       toast.success('Server settings updated');
       onServerUpdate?.();
       onOpenChange(false);
+    }
+  };
+
+  const handleIconUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${serverId}/icon.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('server_images')
+      .upload(fileName, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error('Failed to upload icon');
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('server_images')
+      .getPublicUrl(fileName);
+
+    setServerSettings(prev => ({ ...prev, icon_url: publicUrl }));
+    toast.success('Icon uploaded');
+  };
+
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${serverId}/banner.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('server_images')
+      .upload(fileName, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error('Failed to upload banner');
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('server_images')
+      .getPublicUrl(fileName);
+
+    setServerSettings(prev => ({ ...prev, banner_url: publicUrl }));
+    toast.success('Banner uploaded');
+  };
+
+  const handleCreateRole = async () => {
+    if (!newRole.name.trim()) {
+      toast.error('Role name is required');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('custom_roles')
+      .insert({
+        server_id: serverId,
+        name: newRole.name,
+        color: newRole.color,
+        permissions: newRole.permissions
+      });
+
+    if (error) {
+      toast.error('Failed to create role');
+    } else {
+      toast.success('Role created');
+      setNewRole({ 
+        name: '', 
+        color: '#5865F2',
+        permissions: {
+          manage_server: false,
+          manage_channels: false,
+          manage_roles: false,
+          kick_members: false,
+          ban_members: false,
+          send_messages: true,
+          connect_voice: true
+        }
+      });
+      fetchData();
     }
   };
 
