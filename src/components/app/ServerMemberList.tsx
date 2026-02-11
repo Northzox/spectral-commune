@@ -88,14 +88,6 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
             avatar_url,
             presence,
             custom_status
-          ),
-          user_badges:user_id (
-            badges (
-              id,
-              name,
-              icon,
-              description
-            )
           )
         `)
         .eq('server_id', serverId)

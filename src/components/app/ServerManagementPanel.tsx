@@ -111,6 +111,7 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
   const [members, setMembers] = useState<ServerMember[]>([]);
   const [customRoles, setCustomRoles] = useState<CustomRole[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showCreateRole, setShowCreateRole] = useState(false);
 
   // Form states
   const [serverSettings, setServerSettings] = useState({ 
@@ -144,25 +145,33 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
 
   const fetchData = async () => {
     setLoading(true);
-    const [channelsRes, categoriesRes, membersRes, serverRes] = await Promise.all([
-      supabase.from('channels').select('*').eq('server_id', serverId).order('position'),
-      supabase.from('channel_categories').select('*').eq('server_id', serverId).order('position'),
+    const [channelsRes, categoriesRes, membersRes, serverRes, rolesRes] = await Promise.all([
+      supabase.from('channels').select('*').eq('server_id', serverId),
+      supabase.from('channel_categories').select('*').eq('server_id', serverId),
       supabase.from('server_members').select(`
         *,
         profiles:user_id (
           id,
           username,
           avatar_url,
-          presence
+          presence,
+          custom_status
         )
-      `).eq('server_id', serverId).order('joined_at'),
-      supabase.from('servers').select('name, description').eq('id', serverId).single()
+      `).eq('server_id', serverId),
+      supabase.from('servers').select('*').eq('id', serverId).single(),
+      supabase.from('custom_roles').select('*').eq('server_id', serverId)
     ]);
-
+    
     if (channelsRes.data) setChannels(channelsRes.data);
     if (categoriesRes.data) setCategories(categoriesRes.data);
     if (membersRes.data) setMembers(membersRes.data);
-    if (serverRes.data) setServerSettings({ name: serverRes.data.name, description: serverRes.data.description || '' });
+    if (serverRes.data) setServerSettings({ 
+      name: serverRes.data.name, 
+      description: serverRes.data.description || '',
+      icon_url: serverRes.data.icon_url || '',
+      banner_url: serverRes.data.banner_url || ''
+    });
+    if (rolesRes.data) setCustomRoles(rolesRes.data);
     setLoading(false);
   };
 
@@ -571,25 +580,154 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
 
           {/* Roles Tab */}
           {activeTab === 'roles' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Role Management</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { name: 'Owner', icon: Crown, color: 'text-yellow-500', description: 'Server owner' },
-                  { name: 'Admin', icon: Shield, color: 'text-purple-500', description: 'Server administrator' },
-                  { name: 'Moderator', icon: Shield, color: 'text-blue-500', description: 'Community moderator' },
-                  { name: 'Member', icon: User, color: 'text-gray-400', description: 'Regular member' },
-                ].map(role => (
-                  <div key={role.name} className="p-4 bg-card border rounded-lg space-y-2">
-                    <div className="flex items-center gap-2">
-                      <role.icon className={`w-5 h-5 ${role.color}`} />
-                      <span className="font-medium">{role.name}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{role.description}</p>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Custom Roles</h3>
+                <Button size="sm" onClick={() => setShowCreateRole(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Role
+                </Button>
+              </div>
+              
+              {/* Existing Roles */}
+              <div className="space-y-3">
+                {customRoles.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Shield className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>No custom roles yet</p>
+                    <p className="text-sm">Create your first custom role to get started</p>
                   </div>
-                ))}
+                ) : (
+                  customRoles.map(role => (
+                    <div key={role.id} className="flex items-center justify-between p-4 bg-card border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                          style={{ backgroundColor: role.color }}
+                        >
+                          {role.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium">{role.name}</p>
+                          <div className="flex gap-1 mt-1">
+                            {role.permissions.manage_server && <Badge variant="secondary" className="text-xs">Server</Badge>}
+                            {role.permissions.manage_channels && <Badge variant="secondary" className="text-xs">Channels</Badge>}
+                            {role.permissions.manage_roles && <Badge variant="secondary" className="text-xs">Roles</Badge>}
+                            {role.permissions.kick_members && <Badge variant="secondary" className="text-xs">Kick</Badge>}
+                            {role.permissions.ban_members && <Badge variant="secondary" className="text-xs">Ban</Badge>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-4 h-4 rounded"
+                          style={{ backgroundColor: role.color }}
+                        />
+                        <Button size="sm" variant="ghost">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Default Roles Info */}
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-3">Default Roles</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    { name: 'Owner', icon: Crown, color: 'text-yellow-500', description: 'Server owner - has all permissions' },
+                    { name: 'Admin', icon: Shield, color: 'text-purple-500', description: 'Server administrator' },
+                    { name: 'Moderator', icon: Shield, color: 'text-blue-500', description: 'Community moderator' },
+                    { name: 'Member', icon: User, color: 'text-gray-400', description: 'Regular member' },
+                  ].map(role => (
+                    <div key={role.name} className="flex items-center gap-2 p-2 rounded bg-muted/50">
+                      <role.icon className={`w-4 h-4 ${role.color}`} />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{role.name}</p>
+                        <p className="text-xs text-muted-foreground">{role.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+          )}
+
+          {/* Create Role Dialog */}
+          {showCreateRole && (
+            <Dialog open={showCreateRole} onOpenChange={setShowCreateRole}>
+              <DialogContent className="bg-card border-border max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create Custom Role</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Role Name</Label>
+                    <Input
+                      value={newRole.name}
+                      onChange={e => setNewRole(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter role name..."
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Role Color</Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={newRole.color}
+                        onChange={e => setNewRole(prev => ({ ...prev, color: e.target.value }))}
+                        className="w-12 h-12 rounded cursor-pointer"
+                      />
+                      <Input
+                        value={newRole.color}
+                        onChange={e => setNewRole(prev => ({ ...prev, color: e.target.value }))}
+                        placeholder="#5865F2"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>Permissions</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(newRole.permissions).map(([key, value]) => (
+                        <label key={key} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={value}
+                            onChange={(e) => setNewRole(prev => ({
+                              ...prev,
+                              permissions: {
+                                ...prev.permissions,
+                                [key]: e.target.checked
+                              }
+                            }))}
+                            className="rounded"
+                          />
+                          <span className="text-sm capitalize">
+                            {key.replace('_', ' ')}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-4">
+                    <Button variant="outline" onClick={() => setShowCreateRole(false)} className="flex-1">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCreateRole} className="flex-1">
+                      Create Role
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
 
           {/* Members Tab */}
