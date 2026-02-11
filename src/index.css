@@ -93,10 +93,42 @@
   text-shadow: 0 0 20px hsl(var(--glow-red) / 0.4);
 }
 
-/* Haunted ambient background */
-.haunted-bg {
-  background: 
-    radial-gradient(ellipse at 20% 50%, hsl(var(--glow-red) / 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, hsl(var(--glow-red) / 0.03) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 100%, hsl(220 15% 6%) 0%, hsl(var(--background)) 60%);
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .server-sidebar {
+    width: 60px !important;
+  }
+  
+  .channel-sidebar {
+    width: 200px !important;
+  }
+  
+  .member-sidebar {
+    display: none !important;
+  }
+  
+  .server-management-panel {
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-layout {
+    flex-direction: column !important;
+  }
+  
+  .server-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+  }
+  
+  .channel-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+  }
 }

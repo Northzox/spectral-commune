@@ -29,6 +29,7 @@ export default function UserSettings() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState<() => void>(() => () => {});
   const [isAdmin, setIsAdmin] = useState(false);
+  const [activeSection, setActiveSection] = useState('account');
 
   useEffect(() => {
     if (!user) return;
@@ -171,16 +172,20 @@ export default function UserSettings() {
         </button>
         <nav className="space-y-1">
           {[
-            { icon: User, label: 'My Account' },
-            { icon: Shield, label: 'Privacy' },
-            { icon: Bell, label: 'Notifications' },
-            { icon: Lock, label: 'Security' },
+            { icon: User, label: 'My Account', id: 'account' },
+            { icon: Shield, label: 'Privacy', id: 'privacy' },
+            { icon: Bell, label: 'Notifications', id: 'notifications' },
+            { icon: Lock, label: 'Security', id: 'security' },
             ...(isAdmin ? [{ icon: Shield, label: 'Admin Panel', href: '/admin' }] : []),
           ].map(item => (
             <button 
               key={item.label} 
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
-              onClick={() => (item as any).href ? navigate((item as any).href) : null}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                activeSection === (item as any).id 
+                  ? 'bg-surface-active text-foreground' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-surface-hover'
+              }`}
+              onClick={() => (item as any).href ? navigate((item as any).href) : setActiveSection((item as any).id)}
             >
               <item.icon className="w-4 h-4" />
               {item.label}
@@ -196,109 +201,150 @@ export default function UserSettings() {
 
       {/* Content */}
       <div className="flex-1 p-8 max-w-2xl">
-        <h1 className="text-2xl font-display font-bold mb-6">My Account</h1>
+        {activeSection === 'account' && (
+          <>
+            <h1 className="text-2xl font-display font-bold mb-6">My Account</h1>
         
-        {/* Profile Banner */}
-        {bannerUrl && (
-          <div className="mb-6 -mx-8 -mt-8 h-32 bg-cover bg-center relative" style={{ backgroundImage: `url(${bannerUrl})` }}>
-            <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-          </div>
+            {/* Profile Banner */}
+            <div className="mb-6 -mx-8 -mt-8 h-32 bg-cover bg-center relative" style={{ 
+              backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined,
+              backgroundColor: bannerUrl ? undefined : profileColor 
+            }}>
+              {!bannerUrl && (
+                <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 to-black/40" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+            </div>
+
+            <div className="space-y-6">
+              {/* Profile Section */}
+              <div className="p-6 bg-card rounded-xl border border-border space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage src={avatarUrl} />
+                      <AvatarFallback className="text-2xl" style={{ backgroundColor: profileColor }}>
+                        {username.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <button
+                      onClick={() => setShowAvatarUpload(true)}
+                      className="absolute bottom-0 right-0 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-card hover:bg-primary/80 transition-colors"
+                    >
+                      <Camera className="w-3 h-3 text-primary-foreground" />
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold">{username}</p>
+                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    {customStatus && (
+                      <p className="text-sm text-muted-foreground italic">{customStatus}</p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowBannerUpload(true)}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Banner
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowColorPicker(true)}
+                    >
+                      <Palette className="w-4 h-4 mr-2" />
+                      Color
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input 
+                    id="username"
+                    value={username} 
+                    onChange={e => setUsername(e.target.value)} 
+                    placeholder="username"
+                    minLength={3}
+                    maxLength={32}
+                    pattern="[a-zA-Z0-9_]+"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    3-32 characters, letters, numbers, and underscores only
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="custom-status">Custom Status</Label>
+                  <Input 
+                    id="custom-status"
+                    value={customStatus} 
+                    onChange={e => setCustomStatus(e.target.value)} 
+                    placeholder="What are you up to?" 
+                    maxLength={128}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {customStatus.length}/128 characters
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea 
+                    id="bio"
+                    value={bio} 
+                    onChange={e => setBio(e.target.value)} 
+                    placeholder="Tell us about yourself" 
+                    rows={3}
+                    maxLength={500}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {bio.length}/500 characters
+                  </p>
+                </div>
+                <Button onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
+          </>
         )}
         
-        <div className="space-y-6">
-          {/* Profile Section */}
-          <div className="p-6 bg-card rounded-xl border border-border space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Avatar className="w-20 h-20">
-                  <AvatarImage src={avatarUrl} />
-                  <AvatarFallback className="text-2xl" style={{ backgroundColor: profileColor }}>
-                    {username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <button
-                  onClick={() => setShowAvatarUpload(true)}
-                  className="absolute bottom-0 right-0 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-card hover:bg-primary/80 transition-colors"
-                >
-                  <Camera className="w-3 h-3 text-primary-foreground" />
-                </button>
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">{username}</p>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-                {customStatus && (
-                  <p className="text-sm text-muted-foreground italic">{customStatus}</p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowBannerUpload(true)}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Banner
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowColorPicker(true)}
-                >
-                  <Palette className="w-4 h-4 mr-2" />
-                  Color
-                </Button>
+        {activeSection === 'privacy' && (
+          <>
+            <h1 className="text-2xl font-display font-bold mb-6">Privacy Settings</h1>
+            <div className="space-y-4">
+              <div className="p-6 bg-card rounded-xl border border-border">
+                <p className="text-muted-foreground">Privacy settings coming soon...</p>
               </div>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input 
-                id="username"
-                value={username} 
-                onChange={e => setUsername(e.target.value)} 
-                placeholder="username"
-                minLength={3}
-                maxLength={32}
-                pattern="[a-zA-Z0-9_]+"
-              />
-              <p className="text-xs text-muted-foreground">
-                3-32 characters, letters, numbers, and underscores only
-              </p>
+          </>
+        )}
+        
+        {activeSection === 'notifications' && (
+          <>
+            <h1 className="text-2xl font-display font-bold mb-6">Notification Settings</h1>
+            <div className="space-y-4">
+              <div className="p-6 bg-card rounded-xl border border-border">
+                <p className="text-muted-foreground">Notification settings coming soon...</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="custom-status">Custom Status</Label>
-              <Input 
-                id="custom-status"
-                value={customStatus} 
-                onChange={e => setCustomStatus(e.target.value)} 
-                placeholder="What are you up to?" 
-                maxLength={128}
-              />
-              <p className="text-xs text-muted-foreground">
-                {customStatus.length}/128 characters
-              </p>
+          </>
+        )}
+        
+        {activeSection === 'security' && (
+          <>
+            <h1 className="text-2xl font-display font-bold mb-6">Security Settings</h1>
+            <div className="space-y-4">
+              <div className="p-6 bg-card rounded-xl border border-border">
+                <p className="text-muted-foreground">Security settings coming soon...</p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea 
-                id="bio"
-                value={bio} 
-                onChange={e => setBio(e.target.value)} 
-                placeholder="Tell us about yourself" 
-                rows={3}
-                maxLength={500}
-              />
-              <p className="text-xs text-muted-foreground">
-                {bio.length}/500 characters
-              </p>
-            </div>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Avatar Upload Dialog */}

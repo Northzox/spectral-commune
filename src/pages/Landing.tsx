@@ -48,8 +48,7 @@ export default function Landing() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Where Dark
-              <span className="text-red-500 block">Souls Gather</span>
+              True <span className="text-red-500 block">Haunted</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
               A pure dark communication platform built for shadows. 
@@ -75,7 +74,7 @@ export default function Landing() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            Built for <span className="text-red-500">True Darkness</span>
+            Features
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((f, i) => (

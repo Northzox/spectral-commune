@@ -5,6 +5,7 @@ import ServerSidebar from '@/components/app/ServerSidebar';
 import ChannelSidebar from '@/components/app/ChannelSidebar';
 import ChatArea from '@/components/app/ChatArea';
 import UserPanel from '@/components/app/UserPanel';
+import ServerMemberList from '@/components/app/ServerMemberList';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function AppLayout() {
@@ -63,6 +64,14 @@ export default function AppLayout() {
               <p>Select a channel to start chatting</p>
             </div>
           )}
+          <div className="w-60 bg-card border-l border-border">
+            <ServerMemberList 
+              open={true}
+              onOpenChange={() => {}}
+              serverId={activeServerId}
+              asSidebar={true}
+            />
+          </div>
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">

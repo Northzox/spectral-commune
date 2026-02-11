@@ -6,6 +6,7 @@ import CreateChannelDialog from './CreateChannelDialog';
 import CreateCategoryDialog from './CreateCategoryDialog';
 import InviteDialog from './InviteDialog';
 import ServerMemberList from './ServerMemberList';
+import ServerManagementPanel from './ServerManagementPanel';
 
 interface Channel {
   id: string;
@@ -34,6 +35,7 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
   const [showCreateCategory, setShowCreateCategory] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
+  const [showManagement, setShowManagement] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -153,6 +155,13 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
           Server Members
         </button>
         <button
+          onClick={() => setShowManagement(true)}
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
+        >
+          <Settings className="w-4 h-4" />
+          Server Management
+        </button>
+        <button
           onClick={() => setShowSettings(true)}
           className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
         >
@@ -216,6 +225,13 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
         open={showMembers}
         onOpenChange={setShowMembers}
         serverId={serverId}
+      />
+
+      <ServerManagementPanel 
+        open={showManagement}
+        onOpenChange={setShowManagement}
+        serverId={serverId}
+        serverName={serverName}
       />
     </div>
   );
