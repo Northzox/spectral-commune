@@ -23,11 +23,12 @@ interface Category {
 interface Props {
   serverId: string;
   activeChannelId: string | null;
-  onSelectChannel: (id: string) => void;
+  onSelectChannel: (channelId: string) => void;
   serverName: string;
+  onServerUpdate?: () => void;
 }
 
-export default function ChannelSidebar({ serverId, activeChannelId, onSelectChannel, serverName }: Props) {
+export default function ChannelSidebar({ serverId, activeChannelId, onSelectChannel, serverName, onServerUpdate }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [showSettings, setShowSettings] = useState(false);
@@ -232,6 +233,7 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
         onOpenChange={setShowManagement}
         serverId={serverId}
         serverName={serverName}
+        onServerUpdate={onServerUpdate}
       />
     </div>
   );

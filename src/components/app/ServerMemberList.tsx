@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import ProfileModal from './ProfileModal';
 import { toast } from 'sonner';
 
 interface ServerMember {
@@ -69,6 +70,8 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [selectedMember, setSelectedMember] = useState<ServerMember | null>(null);
   const [newRole, setNewRole] = useState('');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!serverId || (!asSidebar && !open)) return;
@@ -110,6 +113,11 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
 
     fetchMembers();
   }, [serverId, open, asSidebar]);
+
+  const handleProfileClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setShowProfileModal(true);
+  };
 
   const handleRoleChange = async () => {
     if (!selectedMember || !newRole) return;
@@ -167,7 +175,8 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
                   return (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
+                      onClick={() => handleProfileClick(member.profiles.id)}
                     >
                       <div className="relative">
                         <Avatar className="w-8 h-8">
@@ -224,7 +233,8 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
                     return (
                       <div
                         key={member.id}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
+                        onClick={() => handleProfileClick(member.profiles.id)}
                       >
                         <div className="relative">
                           <Avatar className="w-8 h-8">
@@ -326,6 +336,13 @@ export default function ServerMemberList({ serverId, open = true, onOpenChange, 
           )}
         </DialogContent>
       </Dialog>
+
+      <ProfileModal 
+        open={showProfileModal}
+        onOpenChange={setShowProfileModal}
+        userId={selectedUserId || ''}
+        isOwnProfile={selectedUserId === user?.id}
+      />
     </>
   );
 }

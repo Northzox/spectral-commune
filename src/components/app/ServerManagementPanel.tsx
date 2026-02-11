@@ -59,6 +59,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   serverId: string;
   serverName: string;
+  onServerUpdate?: () => void;
 }
 
 const channelTypes = [
@@ -82,7 +83,7 @@ const roleColors = {
   member: 'text-gray-400'
 };
 
-export default function ServerManagementPanel({ open, onOpenChange, serverId, serverName }: Props) {
+export default function ServerManagementPanel({ open, onOpenChange, serverId, serverName, onServerUpdate }: Props) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'roles' | 'members'>('overview');
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -136,6 +137,7 @@ export default function ServerManagementPanel({ open, onOpenChange, serverId, se
       toast.error('Failed to update server settings');
     } else {
       toast.success('Server settings updated');
+      onServerUpdate?.();
       onOpenChange(false);
     }
   };

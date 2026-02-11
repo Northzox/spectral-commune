@@ -15,11 +15,30 @@ export default function AppLayout() {
   const [serverName, setServerName] = useState('');
   const [channelName, setChannelName] = useState('');
 
+  const handleServerUpdate = () => {
+    // Refresh server data
+    if (activeServerId) {
+      fetchServerData();
+    }
+  };
+
+  const fetchServerData = async () => {
+    if (!activeServerId) return;
+    
+    const { data } = await supabase
+      .from('servers')
+      .select('name')
+      .eq('id', activeServerId)
+      .single();
+    
+    if (data) {
+      setServerName(data.name);
+    }
+  };
+
   useEffect(() => {
     if (!activeServerId) return;
-    supabase.from('servers').select('name').eq('id', activeServerId).single().then(({ data }) => {
-      if (data) setServerName(data.name);
-    });
+    fetchServerData();
     setActiveChannelId(null);
   }, [activeServerId]);
 
@@ -54,6 +73,7 @@ export default function AppLayout() {
               activeChannelId={activeChannelId}
               onSelectChannel={setActiveChannelId}
               serverName={serverName}
+              onServerUpdate={handleServerUpdate}
             />
             <UserPanel />
           </div>

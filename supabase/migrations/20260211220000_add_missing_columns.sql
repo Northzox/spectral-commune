@@ -1,6 +1,8 @@
--- Add missing profile_color column to profiles table
+-- Add missing profile columns to profiles table
 ALTER TABLE public.profiles 
-ADD COLUMN profile_color TEXT DEFAULT '#5865F2';
+ADD COLUMN IF NOT EXISTS profile_color TEXT DEFAULT '#5865F2',
+ADD COLUMN IF NOT EXISTS avatar_url TEXT,
+ADD COLUMN IF NOT EXISTS banner_url TEXT;
 
 -- Fix missing RLS policies for channels
 CREATE POLICY "Server owners can create channels" ON public.channels FOR INSERT TO authenticated
