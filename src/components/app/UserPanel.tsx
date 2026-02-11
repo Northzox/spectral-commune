@@ -1,20 +1,27 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
-import { Settings, Mic, Headphones } from 'lucide-react';
+import { Settings, Mic, Headphones, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { checkIsAdmin } from '@/lib/supabase-helpers';
 
 export default function UserPanel() {
   const { user, signOut } = useAuth();
   const [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
+    
+    // Fetch username
     supabase.from('profiles').select('username').eq('id', user.id).single().then(({ data }) => {
       if (data) setUsername(data.username);
     });
+    
+    // Check admin status
+    checkIsAdmin(user.id).then(setIsAdmin);
   }, [user]);
 
   return (
@@ -56,6 +63,19 @@ export default function UserPanel() {
           </TooltipTrigger>
           <TooltipContent>Settings</TooltipContent>
         </Tooltip>
+        {isAdmin && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={() => navigate('/admin')}
+                className="p-1.5 rounded hover:bg-surface-hover text-primary hover:text-primary/80 transition-colors"
+              >
+                <Shield className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Admin Panel</TooltipContent>
+          </Tooltip>
+        )}
       </div>
     </div>
   );
