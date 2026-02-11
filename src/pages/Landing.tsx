@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Shield, Mic, Bot, Users, Zap } from 'lucide-react';
+import { MessageSquare, Shield, Mic, Bot, Users, Zap, Ghost } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const features = [
@@ -20,10 +20,10 @@ export default function Landing() {
         <div className="container mx-auto flex items-center justify-between h-16 px-6">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
-              <span className="text-primary font-display font-bold text-sm">H</span>
+              <Ghost className="w-4 h-4 text-primary" />
             </div>
             <span className="font-display font-bold text-lg tracking-wide text-foreground">
-              Haunted<span className="text-primary">Cord</span>
+              Spectral<span className="text-primary">Commune</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">
@@ -46,17 +46,17 @@ export default function Landing() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 leading-tight">
-              Where Gamers
-              <span className="text-primary text-glow block">Unite</span>
+              Where Spirits
+              <span className="text-primary text-glow block">Communicate</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl mx-auto leading-relaxed">
-              A dark, powerful communication platform built for gaming communities. 
+              A dark, ethereal communication platform built for modern communities. 
               No compromises. No limits. Free forever.
             </p>
             <div className="flex gap-4 justify-center">
               <Link to="/register">
                 <Button size="lg" className="glow-red text-base px-8">
-                  Get Started — Free
+                  Join the Commune — Free
                 </Button>
               </Link>
             </div>
@@ -73,7 +73,7 @@ export default function Landing() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            Built for <span className="text-primary">Power Users</span>
+            Built for <span className="text-primary">Modern Communities</span>
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((f, i) => (
@@ -97,7 +97,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t border-border py-8 px-6">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
-          © 2026 Haunted Cord. All rights reserved.
+          © 2026 Spectral Commune. All rights reserved.
         </div>
       </footer>
     </div>

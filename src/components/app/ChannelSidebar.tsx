@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Hash, Volume2, Megaphone, MessageSquare, ChevronDown, Plus, Settings, FolderPlus, UserPlus } from 'lucide-react';
+import { Hash, Volume2, Megaphone, MessageSquare, ChevronDown, Plus, Settings, FolderPlus, UserPlus, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ServerSettingsDialog from './ServerSettingsDialog';
 import CreateChannelDialog from './CreateChannelDialog';
 import CreateCategoryDialog from './CreateCategoryDialog';
 import InviteDialog from './InviteDialog';
+import ServerMemberList from './ServerMemberList';
 
 interface Channel {
   id: string;
@@ -32,6 +33,7 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
   const [showCreateChannel, setShowCreateChannel] = useState(false);
   const [showCreateCategory, setShowCreateCategory] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -62,7 +64,10 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
   return (
     <div className="w-60 bg-card border-r border-border flex flex-col">
       {/* Server header */}
-      <div className="h-12 px-4 flex items-center justify-between border-b border-border hover:bg-surface-hover transition-colors cursor-pointer">
+      <div 
+        className="h-12 px-4 flex items-center justify-between border-b border-border hover:bg-surface-hover transition-colors cursor-pointer"
+        onClick={() => setShowSettings(true)}
+      >
         <span className="font-semibold text-sm truncate">{serverName}</span>
         <ChevronDown className="w-4 h-4 text-muted-foreground" />
       </div>
@@ -141,6 +146,13 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
           Invite People
         </button>
         <button
+          onClick={() => setShowMembers(true)}
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
+        >
+          <Users className="w-4 h-4" />
+          Server Members
+        </button>
+        <button
           onClick={() => setShowSettings(true)}
           className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
         >
@@ -197,6 +209,12 @@ export default function ChannelSidebar({ serverId, activeChannelId, onSelectChan
       <InviteDialog 
         open={showInvite} 
         onOpenChange={setShowInvite} 
+        serverId={serverId}
+      />
+
+      <ServerMemberList 
+        open={showMembers}
+        onOpenChange={setShowMembers}
         serverId={serverId}
       />
     </div>
