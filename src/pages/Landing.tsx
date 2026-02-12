@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Shield, Mic, Bot, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,11 +41,7 @@ export default function Landing() {
       {/* Hero */}
       <section className="pt-32 pb-20 px-6">
         <div className="container mx-auto text-center max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="mb-8">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               <span className="text-red-500 block" style={{
                 textShadow: '0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.3)',
@@ -63,39 +58,30 @@ export default function Landing() {
             <div className="flex gap-4 justify-center">
               <Link to="/register">
                 <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-base px-8">
-                  Enter the Shadows — Free
+                  Enter Shadows — Free
                 </Button>
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Features */}
       <section className="py-20 px-6 bg-gray-950">
         <div className="container mx-auto max-w-5xl">
-          <motion.h2 
-            className="text-3xl font-bold text-center mb-16 text-white"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
+          <h2 className="text-3xl font-bold text-center mb-16 text-white">
             Features
-          </motion.h2>
+          </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <motion.div
+              <div
                 key={f.title}
                 className="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-red-900/50 transition-all group"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
               >
                 <f.icon className="w-8 h-8 text-red-500 mb-4 group-hover:text-red-400 transition-all" />
                 <h3 className="font-semibold text-white mb-2">{f.title}</h3>
                 <p className="text-sm text-gray-400">{f.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
