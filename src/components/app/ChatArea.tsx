@@ -80,69 +80,107 @@ export default function ChatArea({ channelId, channelName }: Props) {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0">
-      {/* Channel header */}
-      <div className="h-12 px-4 flex items-center gap-2 border-b border-border shrink-0">
-        <Hash className="w-5 h-5 text-channel-icon" />
-        <span className="font-semibold text-sm">{channelName}</span>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-center text-muted-foreground mt-20">
-            <Hash className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-lg font-semibold">Welcome to #{channelName}</p>
-            <p className="text-sm">This is the start of the channel.</p>
-          </div>
-        )}
-        {messages.map(msg => (
-          <div key={msg.id} className="flex gap-3 group hover:bg-surface-hover rounded-md px-2 py-1 -mx-2 transition-colors">
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5">
-              {msg.profiles?.avatar_url ? (
-                <img src={msg.profiles.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
-              ) : (
-                <span className="text-sm font-semibold text-muted-foreground">
-                  {(msg.profiles?.username || '?').charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-baseline gap-2">
-                <span className="font-semibold text-sm text-foreground">{msg.profiles?.username || 'Unknown'}</span>
-                <span className="text-xs text-muted-foreground">{formatTime(msg.created_at)}</span>
-              </div>
-              <p className="text-sm text-foreground/90 break-words">{msg.content}</p>
-            </div>
-          </div>
-        ))}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input */}
-      <form onSubmit={sendMessage} className="px-4 pb-4">
-        <div className="flex items-center gap-2 bg-input rounded-lg px-4 py-2.5 border border-border focus-within:border-primary/50 transition-colors">
-          <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
-            <Plus className="w-5 h-5" />
+    <div className="flex-1 flex flex-col bg-[#36393f]">
+      {/* Channel Header */}
+      <div className="h-12 px-4 flex items-center justify-between border-b border-[#202225] shadow-sm">
+        <div className="flex items-center gap-2">
+          <Hash className="w-5 h-5 text-gray-400" />
+          <span className="font-semibold text-white">{channelName}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="p-2 rounded hover:bg-[#4f545c] transition-colors">
+            <Plus className="w-4 h-4 text-gray-400 hover:text-white" />
           </button>
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder={`Message #${channelName}`}
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-          <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
-            <Smile className="w-5 h-5" />
-          </button>
-          <button 
-            type="submit" 
-            disabled={!input.trim() || sending}
-            className="text-primary hover:text-primary/80 disabled:opacity-30 transition-colors"
-          >
-            <Send className="w-5 h-5" />
+          <button className="p-2 rounded hover:bg-[#4f545c] transition-colors">
+            <Smile className="w-4 h-4 text-gray-400 hover:text-white" />
           </button>
         </div>
-      </form>
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#202225]" ref={bottomRef}>
+        {messages.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="text-center">
+              <Hash className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+              <p className="text-lg font-medium mb-2">Welcome to #{channelName}!</p>
+              <p className="text-sm text-gray-400">This is the beginning of the #{channelName} channel.</p>
+              <p className="text-sm text-gray-400">Be the first to say something!</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 p-4">
+            {messages.map(message => (
+              <div key={message.id} className="flex gap-3 group">
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                  {message.profiles?.avatar_url ? (
+                    <img 
+                      src={message.profiles.avatar_url} 
+                      alt={message.profiles.username}
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-[#5865f2] flex items-center justify-center">
+                      <span className="text-white font-bold">
+                        {message.profiles?.username?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Message Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="font-medium text-gray-300 hover:text-white">
+                      {message.profiles?.username}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {formatTime(message.created_at)}
+                    </span>
+                  </div>
+                  <div className="bg-[#4f545c] rounded-lg p-3 group-hover:bg-[#5865f2] transition-colors">
+                    <p className="text-gray-100 whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Message Input */}
+      <div className="p-4 border-t border-[#202225]">
+        <form 
+          onSubmit={sendMessage}
+          className="flex items-center gap-2"
+        >
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={`Message #${channelName}`}
+              className="w-full px-4 py-3 bg-[#40444b] border border-[#202225] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5865f2] focus:border-transparent"
+              disabled={sending}
+            />
+          </div>
+          <Button 
+            type="submit" 
+            size="sm"
+            disabled={!input.trim() || sending}
+            className="px-4 py-2 bg-[#5865f2] hover:bg-[#4752c5] text-white font-medium transition-colors disabled:opacity-50"
+          >
+            {sending ? (
+              <div className="w-4 h-4 animate-spin rounded border-2 border-gray-600 border-t-transparent"></div>
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
